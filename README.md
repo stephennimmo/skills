@@ -1,21 +1,30 @@
 # skills
 
-Personal [Claude Code](https://claude.com/claude-code) skills for Java, Quarkus and Angular development. Each folder is one skill, with a `SKILL.md` that Claude loads when the task matches the skill's description.
+Personal [Claude Code](https://claude.com/claude-code) and [Cursor Agent](https://cursor.com) skills for Java, Quarkus and Angular development. Each folder is one skill, with a `SKILL.md` that the agent loads when the task matches the skill's description.
 
 ## Getting Started
 
-Clone the repository and symlink each skill into `~/.claude/skills/` so Claude Code loads it in every project:
+Clone the repository and symlink each skill into the personal skills directories for Claude Code (`~/.claude/skills/`) and the Cursor Agent (`~/.cursor/skills/`):
 
 ```shell
 git clone git@github.com:stephennimmo/skills.git ~/projects/github/stephennimmo/skills
 cd ~/projects/github/stephennimmo/skills
-mkdir -p ~/.claude/skills
+mkdir -p ~/.claude/skills ~/.cursor/skills
 for skill in */; do
   ln -sfn "$PWD/${skill%/}" ~/.claude/skills/"${skill%/}"
+  ln -sfn "$PWD/${skill%/}" ~/.cursor/skills/"${skill%/}"
 done
 ```
 
-Because the skills are symlinked, edits in this repository take effect in the next Claude Code session without reinstalling. Rerun the loop after adding a skill; `-sfn` makes it safe to run again.
+Verify the links:
+
+```shell
+ls -l ~/.claude/skills ~/.cursor/skills
+```
+
+- Because the skills are symlinked, edits in this repository take effect in the next Claude Code or Cursor Agent session without reinstalling.
+- Rerun the loop after adding a skill. `-sfn` replaces existing links, so it is safe to run again.
+- Leave `~/.claude/skills/synced/` (managed by claude.ai) and `~/.cursor/skills-cursor/` (Cursor's built-in skills) alone. Skill names here must not clash with anything in those folders.
 
 ## Skills
 
@@ -69,6 +78,6 @@ skills/
 ### Adding a skill
 
 1. Create a folder named after the skill.
-2. Add a `SKILL.md` with `name` and `description` frontmatter. Write the description so it says when the skill should be used, since Claude relies on it to decide when to load the skill.
-3. Symlink the folder into `~/.claude/skills/` and add it to the Skills table above.
+2. Add a `SKILL.md` with `name` and `description` frontmatter. Write the description so it says when the skill should be used, since the agent relies on it to decide when to load the skill.
+3. Rerun the symlink loop from Getting Started, and add the skill to the Skills table above.
 4. Keep each rule in exactly one skill. When skills build on each other, reference the other skill by name (for example, `quarkus-rest` says to follow `java` and `quarkus`) instead of copying its rules.
