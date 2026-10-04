@@ -1,6 +1,6 @@
 ---
 name: angular
-description: Angular coding conventions. Use when creating an Angular project (standalone or inside a Quarkus project with Quinoa), or when writing, generating or reviewing any Angular code, including pages, shared components, modals, guards, services, model interfaces and OIDC login.
+description: Angular coding conventions. Use when creating an Angular project, or when writing, generating or reviewing any Angular code, including pages, shared components, modals, guards, services, model interfaces and OIDC login.
 ---
 
 ## Creating a Project
@@ -17,16 +17,7 @@ git commit -m 'Angular project init'
 
 - Use the latest LTS release of Angular.
 - The dev server runs on port 4200.
-- Inside an existing Quarkus project using Quinoa, add `--skip-git` to `ng new` and skip the `git` commands. See Quinoa below.
-
-### Quinoa (Angular inside Quarkus)
-
-- Put the Angular project in `src/main/webui`.
-- Only two configuration additions are needed:
-```shell
-yq -i '.quarkus.quinoa.enable-spa-routing = true' src/main/resources/application.yaml
-yq -i '.quarkus.quinoa.build-dir = "dist/'$NG_PROJECT_NAME'/browser"' src/main/resources/application.yaml
-```
+- Inside an existing Quarkus project using Quinoa, add `--skip-git` to `ng new` and skip the `git` commands. Follow the `quarkus-quinoa` skill for where the project goes and how Quarkus serves it.
 
 ## Coding Conventions
 
@@ -43,12 +34,12 @@ export interface Account {
 
 ## Project Structure
 
-| Kind              | Folder                    | File suffix       | Class name suffix |
-| ---               | ---                       | ---               | ---               |
-| Page component    | `src/app/pages`           | `.page.ts`        | `Page`            |
-| Shared component  | `src/app/pages/shared`    | `.component.ts`   | `Component`       |
-| Guard             | `src/app/guards`          | `.guard.ts`       | `Guard`           |
-| Service           | `src/app/services`        | `.service.ts`     | `Service`         |
+| Kind             | Folder                 | File suffix     | Class name suffix |
+| ---              | ---                    | ---             | ---               |
+| Page component   | `src/app/pages`        | `.page.ts`      | `Page`            |
+| Shared component | `src/app/pages/shared` | `.component.ts` | `Component`       |
+| Guard            | `src/app/guards`       | `.guard.ts`     | `Guard`           |
+| Service          | `src/app/services`     | `.service.ts`   | `Service`         |
 
 - A modal component used by only one page goes in that page's folder.
 - Shared components are ones used across pages, such as the navbar.
