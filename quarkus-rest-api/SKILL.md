@@ -17,13 +17,24 @@ Also follow the `java` skill for general Java conventions (records, Optional, co
 
 Every REST feature is built in three layers. Dependencies point one way only: Resource → Service → Repository. No layer skips a level or calls upward.
 
-Packages: `com.examplecompany.${project_name}.{api|service|repository}`
+### Packages
 
-| Package      | Contains                                   | Naming                                                           | Public methods consume/produce |
-| ---          | ---                                        | ---                                                              | ---                            |
-| `api`        | Resource classes, Request/Response records | `CustomerResource`, `CustomerRequest`, `CustomerResponse`        | Request and Response records   |
-| `service`    | Service classes, Domain records            | `CustomerService`, `Customer` (just the noun, no `Domain` suffix) | Domain records only            |
-| `repository` | Repository classes, Entity classes         | `CustomerRepository`, `CustomerEntity`                           | Entity classes only            |
+Package by domain subject, not by layer. All three layers for a subject live together in one package: `com.example.${project_name}.${subject}`. There are no `api`, `service` or `repository` packages.
+
+For a `customerapi` project, the `com.example.customerapi.customer` package contains:
+
+| Class                 | Layer      | Kind                                              | Public methods consume/produce |
+| ---                   | ---        | ---                                               | ---                            |
+| `CustomerResource`    | Resource   | Resource class                                    | Request and Response records   |
+| `NewCustomerRequest`  | Resource   | Request record for creating (`POST`)              |                                |
+| `EditCustomerRequest` | Resource   | Request record for updating (`PUT`)               |                                |
+| `CustomerResponse`    | Resource   | Response record                                   |                                |
+| `CustomerService`     | Service    | Service class                                     | Domain records only            |
+| `Customer`            | Service    | Domain record (just the noun, no `Domain` suffix) |                                |
+| `CustomerRepository`  | Repository | Repository class                                  | Entity classes only            |
+| `CustomerEntity`      | Repository | Panache entity                                    |                                |
+
+Because the layers share a package, package boundaries don't enforce the layering. The class roles and the dependency rules below do: a Resource never touches `CustomerRepository` or `CustomerEntity`, even though they are visible.
 
 Generated IDs are named after the entity, never just `id`: `Customer` has `customerId`, `Bill` has `billId`. This applies to entities, domain records, request/response records and database columns (`customer_id`).
 
@@ -32,8 +43,9 @@ Owns the HTTP contract and nothing else.
 - Annotated with `@Path`, uses Quarkus REST (`quarkus-rest`, `quarkus-rest-jackson`).
 - Version every endpoint in the URL: `/api/v1/customers`.
 - Accepts Request records and returns Response records only. Never exposes domain records or entities in the API.
+- Uses a separate Request record per operation: `NewCustomerRequest` for create, `EditCustomerRequest` for update. The ID comes from the path, never from the request body.
 - Validates input with `@Valid` and Bean Validation annotations on the Request record.
-- Converts Request → domain with `request.toDomain()` and domain → Response with `CustomerResponse.from(customer)`.
+- Converts Request → domain with `request.toDomain()` (`request.toDomain(customerId)` for edits) and domain → Response with `CustomerResponse.from(customer)`.
 - Always returns `jakarta.ws.rs.core.Response` with the correct HTTP status code (201 + Location on create, 204 on delete, 404 when not found, 400 for bad requests).
 - Documents every endpoint with OpenAPI (`quarkus-smallrye-openapi`). Use `@APIResponse` to declare each response code and its return type, including the error states.
 - Puts `@RolesAllowed` on each method, never on the class.
@@ -41,6 +53,8 @@ Owns the HTTP contract and nothing else.
 - Contains no business logic, no `@Transactional`.
 
 ```java
+package com.example.customerapi.customer;
+
 @Path("/api/v1/customers")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -57,7 +71,7 @@ public class CustomerResource {
     @RolesAllowed(Roles.CRM_READ)
     @APIResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CustomerResponse.class)))
     @APIResponse(responseCode = "404", description = "Customer not found")
-    public Response get(@PathParam("customerId") Long customerId) {
+    public Response get(@PathParam("customerId") Integer customerId) {
         return customerService.findById(customerId)
                 .map(customer -> Response.ok(CustomerResponse.from(customer)).build())
                 .orElseGet(() -> Response.status(Response.Status.NOT_FOUND).build());
@@ -67,31 +81,47 @@ public class CustomerResource {
     @RolesAllowed(Roles.CRM_WRITE)
     @APIResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = CustomerResponse.class)))
     @APIResponse(responseCode = "400", description = "Invalid request")
-    public Response create(@Valid CustomerRequest request, @Context UriInfo uriInfo) {
+    public Response create(@Valid NewCustomerRequest request, @Context UriInfo uriInfo) {
         Customer customer = customerService.create(request.toDomain());
         URI location = uriInfo.getAbsolutePathBuilder().path(customer.customerId().toString()).build();
         return Response.created(location).entity(CustomerResponse.from(customer)).build();
+    }
+
+    @PUT
+    @Path("/{customerId}")
+    @RolesAllowed(Roles.CRM_WRITE)
+    @APIResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CustomerResponse.class)))
+    @APIResponse(responseCode = "400", description = "Invalid request")
+    @APIResponse(responseCode = "404", description = "Customer not found")
+    public Response update(@PathParam("customerId") Integer customerId, @Valid EditCustomerRequest request) {
+        return customerService.update(request.toDomain(customerId))
+                .map(customer -> Response.ok(CustomerResponse.from(customer)).build())
+                .orElseGet(() -> Response.status(Response.Status.NOT_FOUND).build());
     }
 }
 ```
 
 ### Service (`*Service`)
 Owns business logic and transactions.
+- `@ApplicationScoped`. Put `@Transactional` on service methods that write.
 - Public methods consume and return Domain records only. Never return entities.
 - Converts domain ↔ entity internally.
 - Injects Repositories only. The service layer is the only way to reach data access.
 
 ### Repository (`*Repository`)
 Owns data access.
-- Use the Panache repository pattern: `@ApplicationScoped` classes implementing `PanacheRepositoryBase<CustomerEntity, Long>`.
+- Use the Panache repository pattern: `@ApplicationScoped` classes implementing `PanacheRepositoryBase<CustomerEntity, Integer>`.
 - Public methods consume and return Entity classes only.
 
 ## Security
 
 - Authentication and authorization use OIDC with JWT bearer tokens (`quarkus-oidc`).
 - Keycloak is the reference provider, but stay provider-agnostic: only standard OIDC configuration, no Keycloak-specific APIs or extensions, so any OIDC provider can be swapped in.
-- Define roles as `String` constants in an interface named `Roles`, and use those constants in `@RolesAllowed` instead of string literals:
+- Define roles as `String` constants in an interface named `Roles`, and use those constants in `@RolesAllowed` instead of string literals.
+- `Roles` is shared by every subject, so it lives in the `security` package (`com.example.${project_name}.security`), not in a subject package:
 ```java
+package com.example.customerapi.security;
+
 public interface Roles {
     String CRM_READ = "crm-read";
     String CRM_WRITE = "crm-write";
@@ -102,7 +132,7 @@ public interface Roles {
 ## Panache Entities
 
 - Suffix is `Entity`: `PersonEntity`, `CarEntity`.
-- Always annotate the class with both `@Entity(name = "...")` and `@Table(name = "...")` to set the entity name and the exact table name.
+- Always annotate the class with both `@Entity(name = "...")` and `@Table(name = "...")`. The entity name is the plain noun without the `Entity` suffix, and the table name is the exact table: `CustomerEntity` has `@Entity(name = "Customer")` and `@Table(name = "customer")`.
 - The ID follows the entity name: `PersonEntity` has `personId`, mapped to the column `person_id`.
 - Every field has `@Column` with `name` set, plus `nullable` matching the schema.
 - Validate fields with Jakarta Validation annotations that reference messages in `ValidationMessages.properties`.
@@ -117,7 +147,7 @@ public class CustomerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id", nullable = false)
-    public Long customerId;
+    public Integer customerId;
 
     @NotBlank(message = "{customer.name.required}")
     @Column(name = "name", nullable = false)
@@ -131,22 +161,22 @@ public class CustomerEntity {
 
 Use Flyway (`quarkus-flyway`) for all schema management. Migrations go in `src/main/resources/db/migration`.
 
-- Table names are singular: `customer`, not `customers`. Exception: use `users` because `user` is a reserved word.
-- The primary key is the table name plus `_id`: `customer` has `customer_id`.
-- Use `BIGSERIAL` for primary keys and `BIGINT` for foreign keys. Do not use UUID.
-- Always restart the primary key sequence at a high value.
+- Table names are singular: `customer`, not `customers`. Exception: use `users` for a user table because `user` is a reserved word.
+- The primary key is the entity root table name plus `_id`: `customer` has `customer_id`.
+- Use `SERIAL` for primary keys and `INT` for foreign keys. Do not use UUID. Map these IDs to `Integer` in Java.
+- Always restart the primary key sequence at `10000000` (8 digits).
 - Use `TEXT` for alphanumeric data, not `VARCHAR`.
 - Add `created_at` and `updated_at` where it makes sense.
 
 ```sql
 CREATE TABLE customer (
-    customer_id BIGSERIAL PRIMARY KEY,
+    customer_id SERIAL PRIMARY KEY,
     name        TEXT      NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER SEQUENCE customer_customer_id_seq RESTART 1000000000;
+ALTER SEQUENCE customer_customer_id_seq RESTART 10000000;
 ```
 
 ### Test data
@@ -199,15 +229,14 @@ Extensive tests for every API endpoint are required, not optional.
 - Cover the success path and every error state declared with `@APIResponse` (400, 404, and so on).
 - Cover security: unauthenticated requests and requests without the required role.
 
-## Quarkus Containerfiles (Red Hat Hardened Images)
+## Containerfiles (Red Hat Hardened Images)
 
 Assume Podman. Name the files `Containerfile`, never `Dockerfile`. Source all images from Red Hat registries (`registry.access.redhat.com/hi/...`, `registry.redhat.io`, `quay.io`).
 
-Put Containerfiles at the **project root**. Delete the generated files under `src/main/docker/` as the source of truth.
-Red Hat Hardened Images are **distroless**: no shell, no package manager, no `run-java.sh`.
-Default runtime user is **UID 65532**.
-Always `COPY --chown=65532:65532` and end with `USER 65532`.
-Use exec-form `ENTRYPOINT` only.
+- Put Containerfiles at the **project root**. Delete the generated files under `src/main/docker/`; the root Containerfiles are the source of truth.
+- Red Hat Hardened Images are **distroless**: no shell, no package manager, no `run-java.sh`.
+- The default runtime user is **UID 65532**. Always `COPY --chown=65532:65532` and end with `USER 65532`.
+- Use exec-form `ENTRYPOINT` only.
 
 ### JVM: `Containerfile`
 - Base: `registry.access.redhat.com/hi/openjdk:latest-runtime`

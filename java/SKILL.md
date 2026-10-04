@@ -5,11 +5,11 @@ description: Java coding conventions. Use when writing, generating or reviewing 
 
 ## General
 
-- Use the latest LTS release for all new code
-- Maven is the preferred build tool
-- Records should be used as DTOs everywhere possible.
-- Optional should be used for any nullable return types
-- Don't use `@Inject`, but instead always use constructor injection. Example:
+- Use the latest LTS release for all new code.
+- Maven is the preferred build tool.
+- Use records as DTOs everywhere possible.
+- Return `Optional` for any nullable return type.
+- Always use constructor injection, never field injection with `@Inject`:
 ```java
 private final CompanyRepository companyRepository;
 
