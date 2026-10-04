@@ -21,6 +21,7 @@ Because the skills are symlinked, edits in this repository take effect in the ne
 
 | Skill              | Covers                                                                                                                                                                                         |
 | ---                | ---                                                                                                                                                                                            |
+| `angular`          | Angular conventions: project creation, Quinoa inside Quarkus, ng-bootstrap, signals, `inject()`, folder and naming structure, OIDC                                                             |
 | `java`             | Java conventions: latest LTS, Maven, records as DTOs, `Optional` returns, constructor injection, Hibernate Validator                                                                           |
 | `quarkus-rest-api` | Quarkus REST APIs: package-by-subject Resource/Service/Repository layering, request/response records, OpenAPI, OIDC security, Panache, Flyway/PostgreSQL, configuration, tests, Containerfiles |
 
@@ -30,6 +31,8 @@ Because the skills are symlinked, edits in this repository take effect in the ne
 
 ```
 skills/
+├── angular/
+│   └── SKILL.md
 ├── java/
 │   └── SKILL.md
 ├── quarkus-rest-api/
