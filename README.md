@@ -1,6 +1,6 @@
 # skills
 
-Personal [Claude Code](https://claude.com/claude-code) and [Cursor Agent](https://cursor.com) skills for Java, Quarkus, Angular, Markdown and MkDocs development. Each folder is one skill, with a `SKILL.md` that the agent loads when the task matches the skill's description.
+Personal [Claude Code](https://claude.com/claude-code) and [Cursor Agent](https://cursor.com) skills for Java, Quarkus, Angular, Markdown, MkDocs and OpenShift documentation work. Each folder is one skill, with a `SKILL.md` that the agent loads when the task matches the skill's description.
 
 ## Getting Started
 
@@ -34,6 +34,7 @@ ls -l ~/.claude/skills ~/.cursor/skills
 | `java`           | Java conventions: latest LTS, Maven, records as DTOs, `Optional` returns, constructor injection, Hibernate Validator                                    |
 | `markdown`       | Markdown conventions: summary-then-commands structure, aligned tables with alignment colons, keep docs in sync with changes                             |
 | `mkdocs`         | Material for MkDocs sites: `mkdocs.yaml`, `.venv`, assets layout, Red Hat branding, GitHub Pages Actions deploy                                         |
+| `openshift-docs` | OpenShift Solution Architect answers: search the local `openshift-docs` markdown knowledgebase, then the web; do not copy the corpus into the skill      |
 | `quarkus`        | Quarkus projects: extensions, `application.yaml` profiles, dev services, Panache entities, Flyway/PostgreSQL, testing, Protobuf/gRPC, Containerfiles    |
 | `quarkus-quinoa` | Quarkus + Angular via Quinoa: adding the UI in `src/main/webui`, Quinoa config, running, shared OIDC                                                    |
 | `quarkus-rest`   | Quarkus REST APIs: package-by-subject Resource/Service/Repository layering, request/response records, OpenAPI, `@RolesAllowed` security, endpoint tests |
@@ -54,6 +55,8 @@ java ──► quarkus ──► quarkus-rest
            angular
 
 markdown ──► mkdocs
+
+openshift-docs   (standalone; corpus lives in openshift-ssa/openshift-docs)
 ```
 
 - `java` applies to all Java code.
@@ -63,6 +66,7 @@ markdown ──► mkdocs
 - `quarkus-quinoa` combines `quarkus`, `quarkus-rest` and `angular` for a Quarkus project that serves an Angular UI.
 - `markdown` applies to all Markdown writing.
 - `mkdocs` builds on `markdown` and owns Material for MkDocs sites, config, assets and GitHub Pages deploy.
+- `openshift-docs` stands on its own. It tells the agent how to search `/home/snimmo/projects/github/openshift-ssa/openshift-docs`; that repo holds the PDFs and markdown, not this skill.
 
 ### Layout
 
@@ -75,6 +79,8 @@ skills/
 ├── markdown/
 │   └── SKILL.md
 ├── mkdocs/
+│   └── SKILL.md
+├── openshift-docs/
 │   └── SKILL.md
 ├── quarkus/
 │   └── SKILL.md
