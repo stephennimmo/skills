@@ -3,6 +3,8 @@ name: angular
 description: Angular coding conventions. Use when creating an Angular project, or when writing, generating or reviewing any Angular code, including pages, shared components, modals, guards, services, model interfaces and OIDC login.
 ---
 
+Do not apply Red Hat branding unless the user asks for it. When they do, follow the `red-hat-branding` skill.
+
 ## Creating a Project
 
 ```shell

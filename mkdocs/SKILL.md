@@ -5,6 +5,8 @@ description: Material for MkDocs documentation sites. Use when creating or chang
 
 Follow the `markdown` skill for page structure and tables.
 
+Do not apply Red Hat branding unless the user asks for it. When they do, follow the `red-hat-branding` skill.
+
 ## Stack
 
 - Theme: [Material for MkDocs](https://squidfunk.github.io/mkdocs-material)
@@ -69,7 +71,7 @@ ${org}.github.io/
 
 ## `mkdocs.yaml` Baseline
 
-Use Material with Red Hat branding (fonts + primary/accent via `extra.css`). Mirror this shape; adjust `site_*`, `repo_*`, logo, and `nav` for the project.
+Mirror this shape; adjust `site_*`, `repo_*`, logo, palette, and `nav` for the project. Default theme is plain Material — not Red Hat branded.
 
 ```yaml
 site_name: Example
@@ -85,20 +87,17 @@ theme:
   favicon: assets/images/logo.png
   palette:
     - scheme: default
-      primary: custom
-      accent: custom
+      primary: indigo
+      accent: indigo
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
-      primary: custom
-      accent: custom
+      primary: indigo
+      accent: indigo
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
-  font:
-    text: Red Hat Text
-    code: Red Hat Mono
   features:
     - navigation.tabs
     - navigation.sections
@@ -149,25 +148,7 @@ nav:
   - Home: index.md
 ```
 
-### Brand CSS
-
-`docs/assets/stylesheets/extra.css` — Red Hat primary red (`#ee0000`). Brand standards: https://www.redhat.com/en/about/brand/standards
-
-```css
-:root {
-  --md-primary-fg-color: #ee0000;
-  --md-primary-fg-color--light: #f56e6e;
-  --md-primary-fg-color--dark: #a30000;
-  --md-accent-fg-color: #ee0000;
-}
-
-[data-md-color-scheme="slate"] {
-  --md-primary-fg-color: #ee0000;
-  --md-primary-fg-color--light: #f56e6e;
-  --md-primary-fg-color--dark: #a30000;
-  --md-accent-fg-color: #ee0000;
-}
-```
+`docs/assets/stylesheets/extra.css` is for site-specific overrides. Leave it empty unless the project needs custom CSS (including Red Hat branding when requested).
 
 ## GitHub Actions Deploy
 
