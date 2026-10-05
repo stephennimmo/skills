@@ -17,7 +17,7 @@ Package by domain subject, not by layer. All three layers for a subject live tog
 For a `customerapi` project, the `com.example.customerapi.customer` package contains:
 
 | Class                 | Layer      | Kind                                              | Public methods consume/produce |
-| ---                   | ---        | ---                                               | ---                            |
+| :---                  | :---       | :---                                              | :---                           |
 | `CustomerResource`    | Resource   | Resource class                                    | Request and Response records   |
 | `NewCustomerRequest`  | Resource   | Request record for creating (`POST`)              |                                |
 | `EditCustomerRequest` | Resource   | Request record for updating (`PUT`)               |                                |

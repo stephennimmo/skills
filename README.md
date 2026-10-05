@@ -1,6 +1,6 @@
 # skills
 
-Personal [Claude Code](https://claude.com/claude-code) and [Cursor Agent](https://cursor.com) skills for Java, Quarkus, Angular and MkDocs development. Each folder is one skill, with a `SKILL.md` that the agent loads when the task matches the skill's description.
+Personal [Claude Code](https://claude.com/claude-code) and [Cursor Agent](https://cursor.com) skills for Java, Quarkus, Angular, Markdown and MkDocs development. Each folder is one skill, with a `SKILL.md` that the agent loads when the task matches the skill's description.
 
 ## Getting Started
 
@@ -29,10 +29,11 @@ ls -l ~/.claude/skills ~/.cursor/skills
 ## Skills
 
 | Skill            | Covers                                                                                                                                                  |
-| ---              | ---                                                                                                                                                     |
+| :---             | :---                                                                                                                                                    |
 | `angular`        | Angular conventions: project creation, ng-bootstrap, signals, `inject()`, folder and naming structure, OIDC                                             |
 | `java`           | Java conventions: latest LTS, Maven, records as DTOs, `Optional` returns, constructor injection, Hibernate Validator                                    |
-| `mkdocs`         | Material for MkDocs sites: `mkdocs.yaml`, `.venv`, assets layout, Red Hat branding, GitHub Pages Actions deploy, docs writing                           |
+| `markdown`       | Markdown conventions: summary-then-commands structure, aligned tables with alignment colons, keep docs in sync with changes                             |
+| `mkdocs`         | Material for MkDocs sites: `mkdocs.yaml`, `.venv`, assets layout, Red Hat branding, GitHub Pages Actions deploy                                         |
 | `quarkus`        | Quarkus projects: extensions, `application.yaml` profiles, dev services, Panache entities, Flyway/PostgreSQL, testing, Protobuf/gRPC, Containerfiles    |
 | `quarkus-quinoa` | Quarkus + Angular via Quinoa: adding the UI in `src/main/webui`, Quinoa config, running, shared OIDC                                                    |
 | `quarkus-rest`   | Quarkus REST APIs: package-by-subject Resource/Service/Repository layering, request/response records, OpenAPI, `@RolesAllowed` security, endpoint tests |
@@ -52,7 +53,7 @@ java ──► quarkus ──► quarkus-rest
               │
            angular
 
-mkdocs   (standalone)
+markdown ──► mkdocs
 ```
 
 - `java` applies to all Java code.
@@ -60,7 +61,8 @@ mkdocs   (standalone)
 - `quarkus-rest` builds on `java` and `quarkus` and owns the REST layering, security and endpoint tests.
 - `angular` stands on its own for any Angular code.
 - `quarkus-quinoa` combines `quarkus`, `quarkus-rest` and `angular` for a Quarkus project that serves an Angular UI.
-- `mkdocs` stands on its own for Material for MkDocs documentation sites.
+- `markdown` applies to all Markdown writing.
+- `mkdocs` builds on `markdown` and owns Material for MkDocs sites, config, assets and GitHub Pages deploy.
 
 ### Layout
 
@@ -69,6 +71,8 @@ skills/
 ├── angular/
 │   └── SKILL.md
 ├── java/
+│   └── SKILL.md
+├── markdown/
 │   └── SKILL.md
 ├── mkdocs/
 │   └── SKILL.md

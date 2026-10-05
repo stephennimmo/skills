@@ -19,7 +19,7 @@ For REST endpoints and the Resource → Service → Repository layering, also fo
 Add extensions with Maven: `./mvnw quarkus:add-extension -Dextensions="<extension>"`.
 
 | Extension                       | Purpose                                      |
-| ---                             | ---                                          |
+| :---                            | :---                                         |
 | `quarkus-config-yaml`           | `application.yaml` configuration             |
 | `quarkus-hibernate-orm-panache` | Panache entities and repositories            |
 | `quarkus-jdbc-postgresql`       | PostgreSQL driver and dev service            |

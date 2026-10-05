@@ -35,7 +35,7 @@ export interface Account {
 ## Project Structure
 
 | Kind             | Folder                 | File suffix     | Class name suffix |
-| ---              | ---                    | ---             | ---               |
+| :---             | :---                   | :---            | :---              |
 | Page component   | `src/app/pages`        | `.page.ts`      | `Page`            |
 | Shared component | `src/app/pages/shared` | `.component.ts` | `Component`       |
 | Guard            | `src/app/guards`       | `.guard.ts`     | `Guard`           |

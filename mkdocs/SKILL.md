@@ -3,6 +3,8 @@ name: mkdocs
 description: Material for MkDocs documentation sites. Use when creating or changing an MkDocs site, docs content, mkdocs.yaml, GitHub Pages deploy workflows, docs assets, or organization github.io documentation repositories.
 ---
 
+Follow the `markdown` skill for page structure and tables.
+
 ## Stack
 
 - Theme: [Material for MkDocs](https://squidfunk.github.io/mkdocs-material)
@@ -207,19 +209,7 @@ jobs:
 
 ## Writing Docs
 
-- Lead with a short summary, then the instructions/commands, then details below.
 - Prefer admonitions, tabs, details, code annotations, and Mermaid fences over custom widgets.
-- When docs or a README already exist, update them when the project changes.
-
-### Tables
-
-Align columns with spaces so raw markdown is readable. Use only three dashes for separator cells:
-
-```markdown
-| Field | Values |
-| ---   | ---    |
-| env   | preprod, prod |
-```
 
 ## `requirements.txt`
 
